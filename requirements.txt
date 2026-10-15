@@ -1,0 +1,8 @@
+# Pipeline environment: loader, Great Expectations gate, dbt (DuckDB + warehouse adapters)
+dbt-core==1.8.8
+dbt-duckdb==1.8.4
+duckdb==1.2.2
+great_expectations==0.18.21
+pandas==2.2.3
+numpy==1.26.4
+protobuf==4.25.5

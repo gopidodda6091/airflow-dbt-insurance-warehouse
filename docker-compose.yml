@@ -1,0 +1,27 @@
+name: airflow-dbt-insurance-warehouse
+
+services:
+  airflow:
+    build: .
+    command: standalone
+    ports:
+      - "8080:8080"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/project/dags
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+      PYTHONPATH: /opt/project/src
+    volumes:
+      - .:/opt/project          # dags, dbt project, GE suites, data/ (DuckDB file lives here)
+      - airflow-home:/opt/airflow
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  airflow-home:

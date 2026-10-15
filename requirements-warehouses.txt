@@ -1,0 +1,4 @@
+# Optional adapters for the snowflake / redshift targets in dbt/profiles.yml
+-r requirements.txt
+dbt-snowflake==1.8.4
+dbt-redshift==1.8.1
