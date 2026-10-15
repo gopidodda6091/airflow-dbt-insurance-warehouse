@@ -1,0 +1,37 @@
+{
+  "expectation_suite_name": "raw_products",
+  "data_asset_type": null,
+  "expectations": [
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "product_code"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_unique",
+      "kwargs": {
+        "column": "product_code"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {
+        "column": "line_of_business",
+        "value_set": [
+          "Personal Auto",
+          "Homeowners",
+          "Commercial Property"
+        ]
+      },
+      "meta": {}
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "great_expectations_version": "0.18.21",
+    "notes": "Raw-layer gate. Duplicates are allowed here; dbt staging removes them."
+  }
+}
