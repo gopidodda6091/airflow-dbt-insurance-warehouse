@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: loss_ratio_monthly
+    description: >
+      Accident-month loss ratio by line of business and policy state.
+      earned_premium is daily pro-rata up to the latest extract date; paid_losses are
+      payments grouped by loss month.
+    columns:
+      - name: month_start
+        tests: [not_null]
+      - name: line_of_business
+        tests: [not_null]
+      - name: paid_losses
+        tests: [non_negative]
