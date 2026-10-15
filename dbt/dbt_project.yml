@@ -1,0 +1,35 @@
+name: lone_star_mutual
+version: "1.0.0"
+config-version: 2
+profile: lone_star_mutual
+
+flags:
+  send_anonymous_usage_stats: false
+
+model-paths: ["models"]
+snapshot-paths: ["snapshots"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+target-path: target
+clean-targets: [target, dbt_packages, logs]
+
+vars:
+  # Calendar covered by dim_date; must contain every coverage day and loss date.
+  date_spine_start: "2025-01-01"
+  date_spine_end: "2028-01-01"
+
+models:
+  lone_star_mutual:
+    staging:
+      +schema: staging
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table
+    reports:
+      +schema: reports
+      +materialized: table
+
+snapshots:
+  lone_star_mutual:
+    +target_schema: snapshots

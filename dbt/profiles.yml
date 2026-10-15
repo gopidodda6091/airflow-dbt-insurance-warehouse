@@ -1,0 +1,30 @@
+# All credentials come from environment variables (see .env.example). Never commit values.
+lone_star_mutual:
+  target: "{{ env_var('DBT_TARGET', 'duckdb') }}"
+  outputs:
+    duckdb:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', 'data/warehouse.duckdb') }}"
+      schema: main
+      threads: 4
+
+    snowflake:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', '') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', '') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', '') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'TRANSFORMER') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'TRANSFORMING') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'LONE_STAR') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA', 'ANALYTICS') }}"
+      threads: 8
+
+    redshift:
+      type: redshift
+      host: "{{ env_var('REDSHIFT_HOST', '') }}"
+      port: "{{ env_var('REDSHIFT_PORT', '5439') | int }}"
+      user: "{{ env_var('REDSHIFT_USER', '') }}"
+      password: "{{ env_var('REDSHIFT_PASSWORD', '') }}"
+      dbname: "{{ env_var('REDSHIFT_DATABASE', 'lone_star') }}"
+      schema: "{{ env_var('REDSHIFT_SCHEMA', 'analytics') }}"
+      threads: 4
