@@ -1,0 +1,15 @@
+# Raw-layer gate run by the Airflow "validate" TaskGroup.
+# Validations (one per raw table, each with its batch for the extract being loaded) are
+# passed in at run time; this file holds the actions every run performs.
+name: raw_checkpoint
+config_version: 1.0
+class_name: Checkpoint
+run_name_template: "raw-%Y%m%d-%H%M%S"
+action_list:
+  - name: store_validation_result
+    action:
+      class_name: StoreValidationResultAction
+  - name: update_data_docs
+    action:
+      class_name: UpdateDataDocsAction
+validations: []
