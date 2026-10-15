@@ -1,0 +1,100 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: Calendar dimension, one row per day.
+    columns:
+      - name: date_key
+        tests: [unique, not_null]
+
+  - name: dim_customer
+    description: Conformed customer dimension (type 1).
+    columns:
+      - name: customer_sk
+        tests: [unique, not_null]
+      - name: customer_id
+        tests: [unique, not_null]
+
+  - name: dim_product
+    description: Conformed product dimension.
+    columns:
+      - name: product_sk
+        tests: [unique, not_null]
+      - name: line_of_business
+        tests:
+          - accepted_values:
+              values: [Personal Auto, Homeowners, Commercial Property]
+
+  - name: dim_policy
+    description: One row per policy version (SCD2 via the snap_policy snapshot).
+    columns:
+      - name: policy_sk
+        tests: [unique, not_null]
+      - name: policy_id
+        tests: [not_null]
+      - name: valid_from
+        tests: [not_null]
+      - name: status
+        tests:
+          - accepted_values:
+              values: [ACTIVE, CANCELLED]
+
+  - name: fact_premium
+    description: One row per premium transaction; written vs earned (daily pro-rata).
+    columns:
+      - name: premium_sk
+        tests: [unique, not_null]
+      - name: transaction_type
+        tests:
+          - accepted_values:
+              values: [NEW, ENDORSEMENT, CANCELLATION]
+      - name: policy_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_policy')
+              field: policy_sk
+      - name: customer_sk
+        tests:
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_sk
+      - name: product_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_product')
+              field: product_sk
+      - name: transaction_date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+
+  - name: fact_claim
+    description: One row per claim payment, joined to the policy version in force on the loss date.
+    columns:
+      - name: claim_payment_sk
+        tests: [unique, not_null]
+      - name: policy_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_policy')
+              field: policy_sk
+      - name: product_sk
+        tests:
+          - relationships:
+              to: ref('dim_product')
+              field: product_sk
+      - name: loss_date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: paid_amount
+        tests: [not_null, non_negative]
+      - name: claim_status
+        tests:
+          - accepted_values:
+              values: [OPEN, CLOSED]
