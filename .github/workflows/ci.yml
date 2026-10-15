@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  DBT_SEND_ANONYMOUS_USAGE_STATS: "false"
+
+jobs:
+  pipeline:
+    name: ruff, dbt build (duckdb), pytest
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install
+        run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Ruff
+        run: |
+          ruff check .
+          ruff format --check .
+      - name: Generate synthetic extracts
+        run: python scripts/generate_data.py --out data/raw
+      - name: dbt deps + load/validate/snapshot/dbt build per extract
+        env:
+          PYTHONPATH: src
+        run: |
+          dbt deps --project-dir dbt --profiles-dir dbt
+          python -m insurance_wh.cli run-all
+      - name: Final dbt build against DuckDB
+        run: dbt build --project-dir dbt --profiles-dir dbt --target duckdb
+      - name: Pytest
+        run: pytest
+
+  dag-integrity:
+    name: Airflow DagBag
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Airflow with official constraints
+        run: |
+          pip install -r requirements-airflow.txt \
+            -c https://raw.githubusercontent.com/apache/airflow/constraints-2.10.3/constraints-3.11.txt
+          pip install -r requirements-dev.txt
+      - name: DAG integrity tests
+        run: pytest tests/test_dag_integrity.py
