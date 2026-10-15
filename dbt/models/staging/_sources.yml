@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Text-typed extracts loaded by Airflow (one row per source row per extract).
+    schema: "{{ env_var('RAW_SCHEMA', 'raw') }}"
+    loaded_at_field: _loaded_at
+    tables:
+      - name: customers
+      - name: products
+      - name: policies
+        description: Full policy snapshot per extract; a policy shows its current version.
+      - name: premium_transactions
+        description: Incremental; late corrections restate a transaction_id with a newer updated_at.
+      - name: claim_payments
+        description: Incremental; late corrections restate a payment_id with a newer updated_at.

@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: stg_customers
+    columns:
+      - name: customer_id
+        tests: [unique, not_null]
+      - name: state
+        tests:
+          - accepted_values:
+              values: [TX, OK, LA, NM, AR]
+  - name: stg_products
+    columns:
+      - name: product_code
+        tests: [unique, not_null]
+  - name: stg_policies
+    columns:
+      - name: policy_id
+        tests: [unique, not_null]
+      - name: customer_id
+        tests:
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+  - name: stg_premium_transactions
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]
+      - name: transaction_type
+        tests:
+          - accepted_values:
+              values: [NEW, ENDORSEMENT, CANCELLATION]
+  - name: stg_claim_payments
+    columns:
+      - name: payment_id
+        tests: [unique, not_null]
+      - name: payment_amount
+        tests: [not_null, non_negative]
+      - name: claim_status
+        tests:
+          - accepted_values:
+              values: [OPEN, CLOSED]
